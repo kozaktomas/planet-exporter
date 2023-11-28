@@ -64,7 +64,7 @@ func (ss *SolarSystem) recalculatePositions() error {
 
 	// report moon distance
 	_, _, distance := moonposition.Position(jde)
-	ss.monitor.PlanceDistanceHistogram.With(prometheus.Labels{
+	ss.monitor.ObjectDistanceGauge.With(prometheus.Labels{
 		"from": "earth",
 		"to":   "moon",
 	}).Set(distance)
@@ -104,7 +104,7 @@ func (ss *SolarSystem) recalculatePositions() error {
 			z := p1.r*p1.sB - p2.r*p2.sB
 			delta := math.Sqrt(x*x + y*y + z*z)
 
-			ss.monitor.PlanceDistanceHistogram.With(prometheus.Labels{
+			ss.monitor.ObjectDistanceGauge.With(prometheus.Labels{
 				"from": p1.name,
 				"to":   p2.name,
 			}).Set(auToKm(delta))
@@ -113,7 +113,7 @@ func (ss *SolarSystem) recalculatePositions() error {
 
 	// calculate and report distance between planets and the Sun
 	for _, p := range planets {
-		ss.monitor.PlanceDistanceHistogram.With(prometheus.Labels{
+		ss.monitor.ObjectDistanceGauge.With(prometheus.Labels{
 			"from": p.name,
 			"to":   "sun",
 		}).Set(auToKm(p.r))
