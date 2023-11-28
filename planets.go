@@ -82,18 +82,11 @@ func (ss *SolarSystem) recalculatePositions() error {
 	}
 
 	// prepare all data needed for calculations
-	// we want to calculate required values only once
 	for _, p := range planets {
-		//planetData, err := planetposition.LoadPlanet(p.code)
 		planetData := ss.planets[p.code]
 		L, B, R := planetData.Position(jde)
-		sB, cB := B.Sincos()
-		sL, cL := L.Sincos()
-
-		p.sB = sB
-		p.cB = cB
-		p.sL = sL
-		p.cL = cL
+		p.sB, p.cB = B.Sincos()
+		p.sL, p.cL = L.Sincos()
 		p.r = R
 	}
 
