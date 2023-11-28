@@ -11,7 +11,7 @@ create/amend alerts based on those metrics to avoid unexpected outages.
 #### Run using Docker
 
 ```
-docker run -p 9042:9042 docker pull ghcr.io/kozaktomas/planet-exporter:main
+docker run -p 9042:9042 ghcr.io/kozaktomas/planet-exporter:main
 curl localhost:9042/metrics
 ```
 
