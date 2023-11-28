@@ -2,7 +2,7 @@
 
 Devastating production outages are usually caused by unexpected planetary alignments. This tool will help you to avoid
 them. It exports current positions of all planets in our solar system. From our experience, it's usually related to the
-certain distance between two planets or between a planets and the Sun. The exporter exports the distance between all
+certain distance between two planets or between a planet and the Sun. The exporter exports the distance between all
 planets and the Sun. Also, the Moon is sometimes involved - so we included distance to the Earth as well. Now you can
 create/amend alerts based on those metrics to avoid unexpected outages.
 
