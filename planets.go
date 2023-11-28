@@ -10,25 +10,61 @@ import (
 	"time"
 )
 
-// Planet represents position and metadata of planet
-type Planet struct {
-	name string
-	code int
+type SolarSystem struct {
+	planets map[int]*planetposition.V87Planet
+	monitor *Monitor
+}
 
-	sB, cB, sL, cL float64 // sinus and cosinus of the planet
-	r              float64 // heliocentric range in AU
+func NewSolarSystem(monitor *Monitor) (*SolarSystem, error) {
+	loaded := 0 // number of successfully loaded planets
+	system := &SolarSystem{
+		planets: map[int]*planetposition.V87Planet{
+			planetposition.Mercury: loadPlanet(planetposition.Mercury, &loaded),
+			planetposition.Venus:   loadPlanet(planetposition.Venus, &loaded),
+			planetposition.Earth:   loadPlanet(planetposition.Earth, &loaded),
+			planetposition.Mars:    loadPlanet(planetposition.Mars, &loaded),
+			planetposition.Jupiter: loadPlanet(planetposition.Jupiter, &loaded),
+			planetposition.Saturn:  loadPlanet(planetposition.Saturn, &loaded),
+			planetposition.Uranus:  loadPlanet(planetposition.Uranus, &loaded),
+			planetposition.Neptune: loadPlanet(planetposition.Neptune, &loaded),
+		},
+		monitor: monitor,
+	}
+	if loaded != len(system.planets) {
+		return nil, fmt.Errorf("failed to load all planets data. You should run `make download` and set `VSOP87` environment variable")
+	}
+	return system, nil
+}
+
+// loadPlanet loads planet data from VSOP87B files
+// loaded counter is a pointer, so we can increment it
+func loadPlanet(planetCode int, loaded *int) *planetposition.V87Planet {
+	planet, err := planetposition.LoadPlanet(planetCode)
+	if err == nil {
+		*loaded++
+	}
+	return planet
 }
 
 // recalculatePositions recalculates positions of planets and moon
 // and updates Prometheus metrics
-func recalculatePositions(monitor *Monitor) error {
+func (ss *SolarSystem) recalculatePositions() error {
+	// Planet represents position and metadata of planet
+	type Planet struct {
+		name string
+		code int
+
+		sB, cB, sL, cL float64 // sinus and cosinus of the planet
+		r              float64 // heliocentric range in AU
+	}
+
 	// the calculation is based on the current time
 	now := time.Now()
 	jde := julian.TimeToJD(now)
 
 	// report moon distance
 	_, _, distance := moonposition.Position(jde)
-	monitor.PlanceDistanceHistogram.With(prometheus.Labels{
+	ss.monitor.PlanceDistanceHistogram.With(prometheus.Labels{
 		"from": "earth",
 		"to":   "moon",
 	}).Set(distance)
@@ -48,10 +84,8 @@ func recalculatePositions(monitor *Monitor) error {
 	// prepare all data needed for calculations
 	// we want to calculate required values only once
 	for _, p := range planets {
-		planetData, err := planetposition.LoadPlanet(p.code)
-		if err != nil {
-			return fmt.Errorf("could not load planet data: %w", err)
-		}
+		//planetData, err := planetposition.LoadPlanet(p.code)
+		planetData := ss.planets[p.code]
 		L, B, R := planetData.Position(jde)
 		sB, cB := B.Sincos()
 		sL, cL := L.Sincos()
@@ -77,7 +111,7 @@ func recalculatePositions(monitor *Monitor) error {
 			z := p1.r*p1.sB - p2.r*p2.sB
 			delta := math.Sqrt(x*x + y*y + z*z)
 
-			monitor.PlanceDistanceHistogram.With(prometheus.Labels{
+			ss.monitor.PlanceDistanceHistogram.With(prometheus.Labels{
 				"from": p1.name,
 				"to":   p2.name,
 			}).Set(auToKm(delta))
@@ -86,7 +120,7 @@ func recalculatePositions(monitor *Monitor) error {
 
 	// calculate and report distance between planets and the Sun
 	for _, p := range planets {
-		monitor.PlanceDistanceHistogram.With(prometheus.Labels{
+		ss.monitor.PlanceDistanceHistogram.With(prometheus.Labels{
 			"from": p.name,
 			"to":   "sun",
 		}).Set(auToKm(p.r))

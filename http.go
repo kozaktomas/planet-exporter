@@ -13,9 +13,9 @@ import (
 )
 
 // NewRouter creates a new HTTP router
-func NewRouter(monitor *Monitor) *http.ServeMux {
+func NewRouter(solarSystem *SolarSystem, monitor *Monitor) *http.ServeMux {
 	router := http.NewServeMux()
-	router.Handle("/metrics", metricsHandler(monitor))
+	router.Handle("/metrics", metricsHandler(solarSystem, monitor))
 	router.Handle("/", homepageHandler())
 
 	return router
@@ -56,20 +56,20 @@ func StartServer(router *http.ServeMux, port int) {
 }
 
 // metricsHandler returns HTTP handler for metrics endpoint
-func metricsHandler(monitor *Monitor) http.Handler {
+func metricsHandler(solarSystem *SolarSystem, monitor *Monitor) http.Handler {
 	return refreshMiddleWare(promhttp.HandlerFor(
 		monitor.Registry,
 		promhttp.HandlerOpts{
 			EnableOpenMetrics: true,
 			Registry:          monitor.Registry,
 		},
-	), monitor)
+	), solarSystem)
 }
 
 // refreshMiddleWare is a middleware that initiate recalculation of object positions
-func refreshMiddleWare(next http.Handler, monitor *Monitor) http.Handler {
+func refreshMiddleWare(next http.Handler, solarSystem *SolarSystem) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if err := recalculatePositions(monitor); err != nil {
+		if err := solarSystem.recalculatePositions(); err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte("could not load data"))
 			return

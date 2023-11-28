@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"log"
 )
 
 var pPort int // pPort is a port for Prometheus exporter
@@ -14,6 +15,10 @@ func main() {
 	flag.Parse()
 
 	monitor := NewMonitor()
-	router := NewRouter(monitor)
+	solarSystem, err := NewSolarSystem(monitor)
+	if err != nil {
+		log.Fatalf("Failed to load planet data: %v", err)
+	}
+	router := NewRouter(solarSystem, monitor)
 	StartServer(router, pPort)
 }

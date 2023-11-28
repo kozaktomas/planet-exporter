@@ -1,4 +1,5 @@
 download:
+	mkdir -p data
 	wget https://raw.githubusercontent.com/ctdk/vsop87/master/VSOP87B.ear -O data/VSOP87B.ear
 	wget https://raw.githubusercontent.com/ctdk/vsop87/master/VSOP87B.jup -O data/VSOP87B.jup
 	wget https://raw.githubusercontent.com/ctdk/vsop87/master/VSOP87B.mar -O data/VSOP87B.mar
