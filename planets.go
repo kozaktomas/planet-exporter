@@ -67,7 +67,7 @@ func (ss *SolarSystem) recalculatePositions() error {
 	ss.monitor.ObjectDistanceGauge.With(prometheus.Labels{
 		"from": "earth",
 		"to":   "moon",
-	}).Set(distance)
+	}).Set(distance * 1000)
 
 	// planets are sorted by the distance from the Sun
 	planets := []*Planet{
@@ -107,7 +107,7 @@ func (ss *SolarSystem) recalculatePositions() error {
 			ss.monitor.ObjectDistanceGauge.With(prometheus.Labels{
 				"from": p1.name,
 				"to":   p2.name,
-			}).Set(auToKm(delta))
+			}).Set(auToM(delta))
 		}
 	}
 
@@ -116,14 +116,14 @@ func (ss *SolarSystem) recalculatePositions() error {
 		ss.monitor.ObjectDistanceGauge.With(prometheus.Labels{
 			"from": p.name,
 			"to":   "sun",
-		}).Set(auToKm(p.r))
+		}).Set(auToM(p.r))
 	}
 
 	return nil
 }
 
-// auToKm converts AU to km
+// auToM converts AU to meters
 // au is astronomical unit
-func auToKm(au float64) float64 {
-	return math.Round(au * 1.5 * math.Pow10(8))
+func auToM(au float64) float64 {
+	return math.Round(au * 1.5 * math.Pow10(11))
 }

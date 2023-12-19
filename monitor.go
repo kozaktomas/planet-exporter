@@ -17,7 +17,7 @@ func NewMonitor() *Monitor {
 
 		ObjectDistanceGauge: prometheus.NewGaugeVec(prometheus.GaugeOpts{
 			Name: "distance_between_objects",
-			Help: "Current distance between objects in the space in kilometers",
+			Help: "Current distance between objects in the space in meters",
 		}, []string{"from", "to"}),
 	}
 
