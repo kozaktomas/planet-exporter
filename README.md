@@ -1,10 +1,7 @@
 # Planet Exporter
 
-Devastating production outages are usually caused by unexpected planetary alignments. This tool will help you to avoid
-them. It exports current positions of all planets in our solar system. From our experience, it's usually related to the
-certain distance between two planets or between a planet and the Sun. The exporter exports the distance between all
-planets and the Sun. Also, the Moon is sometimes involved - so we included distance to the Earth as well. Now you can
-create/amend alerts based on those metrics to avoid unexpected outages.
+Correlate production issues with planet constellations using Prometheus. Do not let the five whys stop you from finding
+the root cause and go right to the cause!
 
 ### Usage
 
@@ -22,14 +19,13 @@ todo
 ### Metrics example
 
 ```
-# HELP distance_between_objects Current distance between objects in the space in kilometers
+# HELP distance_between_objects Current distance between objects in the space in meters
 # TYPE distance_between_objects gauge
-distance_between_objects{from="earth",to="jupiter"} 6.13527435e+08
-distance_between_objects{from="earth",to="mars"} 3.76274473e+08
-distance_between_objects{from="earth",to="moon"} 384925.0368589994
-distance_between_objects{from="earth",to="neptune"} 4.435408063e+09
-distance_between_objects{from="earth",to="saturn"} 1.467320168e+09
-distance_between_objects{from="earth",to="uranus"} 2.799938039e+09
+distance_between_objects{from="earth",to="jupiter"} 6.47142851255e+11
+distance_between_objects{from="earth",to="mars"} 3.68829062259e+11
+distance_between_objects{from="earth",to="moon"} 3.7115189771399796e+08
+distance_between_objects{from="earth",to="neptune"} 4.490103341003e+12
+distance_between_objects{from="earth",to="saturn"} 1.518308348414e+12
 # ....
 ```
 
